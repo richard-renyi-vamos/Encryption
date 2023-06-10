@@ -1,0 +1,42 @@
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import pad
+from Crypto.Random import get_random_bytes
+
+
+def encrypt_file(file_path, key):
+    # Generate a random initialization vector (IV)
+    iv = get_random_bytes(AES.block_size)
+
+    # Create AES cipher object with the provided key and AES.MODE_CBC mode
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+
+    try:
+        # Open the input file in binary mode
+        with open(file_path, 'rb') as file:
+            plaintext = file.read()
+
+        # Pad the plaintext to match the block size
+        padded_plaintext = pad(plaintext, AES.block_size)
+
+        # Encrypt the padded plaintext
+        ciphertext = cipher.encrypt(padded_plaintext)
+
+        # Write the IV and ciphertext to the output file
+        output_file_path = file_path + ".enc"
+        with open(output_file_path, 'wb') as file:
+            file.write(iv)
+            file.write(ciphertext)
+
+        print("Encryption completed successfully. Encrypted file: {}".format(output_file_path))
+
+    except IOError:
+        print("Error: Could not open the file.")
+
+
+# Example usage
+key = b'16-byte secret key'  # Change this to your desired key
+file_path = 'path/to/your/file.txt'  # Change this to the path of your file
+
+encrypt_file(file_path, key)
+
+# CREATED WITH THE HELP OF OPEN-AI CHAT GPT: https://chat.openai.com/chat
