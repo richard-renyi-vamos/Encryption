@@ -1,0 +1,72 @@
+import tkinter as tk
+from tkinter import filedialog
+from cryptography.fernet import Fernet
+
+# Create a tkinter window
+app = tk.Tk()
+app.title("File Encryption App")
+
+# Function to select a text file to encrypt
+def select_file():
+    file_path = filedialog.askopenfilename()
+    file_path_entry.delete(0, tk.END)
+    file_path_entry.insert(0, file_path)
+
+# Function to encrypt the selected text file
+def encrypt_file():
+    password = password_entry.get()
+    file_path = file_path_entry.get()
+
+    if not password or not file_path:
+        result_label.config(text="Please enter a password and select a file.")
+        return
+
+    try:
+        with open(file_path, 'rb') as file:
+            data = file.read()
+
+        key = Fernet.generate_key()
+        cipher_suite = Fernet(key)
+        encrypted_data = cipher_suite.encrypt(data)
+
+        encrypted_file_path = file_path + ".encrypted"
+
+        with open(encrypted_file_path, 'wb') as encrypted_file:
+            encrypted_file.write(encrypted_data)
+
+        result_label.config(text=f"File encrypted successfully to {encrypted_file_path}")
+    except Exception as e:
+        result_label.config(text=f"An error occurred: {str(e)}")
+
+# Label for password input
+password_label = tk.Label(app, text="Enter Password:")
+password_label.pack()
+
+# Entry for password input
+password_entry = tk.Entry(app, show='*')
+password_entry.pack()
+
+# Label for file selection
+file_label = tk.Label(app, text="Select a Text File:")
+file_label.pack()
+
+# Entry for file path
+file_path_entry = tk.Entry(app)
+file_path_entry.pack()
+
+# Button to select a file
+select_file_button = tk.Button(app, text="Browse", command=select_file)
+select_file_button.pack()
+
+# Button to encrypt the file
+encrypt_button = tk.Button(app, text="Encrypt", command=encrypt_file)
+encrypt_button.pack()
+
+# Label to display the result
+result_label = tk.Label(app, text="")
+result_label.pack()
+
+app.mainloop()
+
+
+# CREATED WITH THE HELP OF OPEN-AI CHAT GPT: https://chat.openai.com/chat
